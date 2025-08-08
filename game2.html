@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مسائل القسمة</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f9f9f9; text-align: center; padding: 20px; }
+  h1 { color: #333; }
+  .problem { font-size: 28px; margin: 20px 0; }
+  input { font-size: 20px; padding: 5px; text-align: center; }
+  button { font-size: 18px; padding: 8px 16px; margin: 5px; }
+  .feedback { font-size: 20px; margin-top: 10px; }
+  .stats { margin-top: 15px; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<h1>توليد مسائل القسمة</h1>
+<div class="problem" id="problemText"></div>
+<input type="number" id="answerInput" placeholder="أدخل خارج القسمة">
+<br>
+<input type="number" id="remainderInput" placeholder="أدخل الباقي (إن وجد)">
+<br>
+<button onclick="checkAnswer()">تحقق</button>
+<button onclick="nextQuestion()">سؤال جديد</button>
+
+<div class="feedback" id="feedback"></div>
+<div class="stats">
+  صحيحة: <span id="correctCount">٠</span> |
+  خاطئة: <span id="wrongCount">٠</span>
+</div>
+
+<script>
+  // تحويل الأرقام الإنجليزية إلى أرقام عربية
+  function toArabicDigits(input) {
+    return String(input).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+  }
+
+  let correct = 0;
+  let wrong = 0;
+  let currentProblem = null;
+
+  function generateProblem() {
+    const divisor = Math.floor(Math.random() * 9) + 1; // من 1 إلى 9
+    const dividend = Math.floor(Math.random() * 9999) + 1; // من 1 إلى 9999
+    const quotient = Math.floor(dividend / divisor);
+    const remainder = dividend % divisor;
+    return { dividend, divisor, answer: quotient, remainder };
+  }
+
+  function renderProblem() {
+    document.getElementById('problemText').textContent =
+      `${toArabicDigits(currentProblem.dividend)} ÷ ${toArabicDigits(currentProblem.divisor)} = ؟`;
+    document.getElementById('answerInput').value = '';
+    document.getElementById('remainderInput').value = '';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('answerInput').focus();
+  }
+
+  function nextQuestion() {
+    currentProblem = generateProblem();
+    renderProblem();
+  }
+
+  function checkAnswer() {
+    const userQuotient = document.getElementById('answerInput').value.trim();
+    const userRemainder = document.getElementById('remainderInput').value.trim();
+
+    if (userQuotient === '') {
+      document.getElementById('feedback').textContent = 'أدخل خارج القسمة.';
+      return;
+    }
+    const q = Number(userQuotient);
+    const r = userRemainder === '' ? 0 : Number(userRemainder);
+
+    if (q === currentProblem.answer && r === currentProblem.remainder) {
+      correct++;
+      document.getElementById('feedback').textContent = 'إجابة صحيحة ✅';
+    } else {
+      wrong++;
+      document.getElementById('feedback').textContent =
+        `خطأ ❌ — الإجابة الصحيحة: ${toArabicDigits(currentProblem.answer)} والباقي ${toArabicDigits(currentProblem.remainder)}`;
+    }
+
+    document.getElementById('correctCount').textContent = toArabicDigits(correct);
+    document.getElementById('wrongCount').textContent = toArabicDigits(wrong);
+  }
+
+  // أول سؤال عند تحميل الصفحة
+  nextQuestion();
+</script>
+
+</body>
+</html>

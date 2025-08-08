@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>لعبة ترتيب الأعداد العشرية (الجزء الصحيح 3 أرقام كحد أقصى)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: #f0f4f8;
+  }
+  h1 {
+    color: #333;
+  }
+  #numbersContainer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+  .numberBox {
+    background: #fff;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 20px 30px;
+    font-size: 32px;
+    cursor: pointer;
+    user-select: none;
+    width: 160px;
+    transition: background-color 0.3s;
+  }
+  .numberBox.selected {
+    background-color: #3498db;
+    color: #fff;
+  }
+  button {
+    padding: 10px 25px;
+    font-size: 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background-color: #27ae60;
+    color: white;
+  }
+  #result {
+    margin-top: 25px;
+    font-size: 24px;
+    min-height: 30px;
+  }
+</style>
+</head>
+<body>
+
+<h1>لعبة ترتيب الأعداد العشرية (الجزء الصحيح 3 أرقام كحد أقصى)</h1>
+
+<p>اضغط على الأعداد لترتيبها ترتيباً تصاعدياً، ثم اضغط تحقق.</p>
+
+<div id="numbersContainer"></div>
+
+<button onclick="checkOrder()">تحقق</button>
+<button onclick="generateNumbers()" style="background-color:#2980b9; margin-left: 10px;">إعادة توليد الأعداد</button>
+
+<div id="result"></div>
+
+<script>
+// لتحويل أرقام انجليزية إلى عربية
+function toArabicDigits(num) {
+  return String(num).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+}
+
+// لتحويل رقم عشري إلى نص عربي مع الفاصلة العربية (3 أرقام بعد الفاصلة)
+function decimalToArabic(num) {
+  let parts = num.toFixed(3).split('.');
+  return toArabicDigits(parts[0]) + '٫' + toArabicDigits(parts[1]);
+}
+
+let numbers = [];
+const container = document.getElementById('numbersContainer');
+let selectedIndex = null;
+
+function generateNumbers() {
+  numbers = [];
+  container.innerHTML = '';
+  selectedIndex = null;
+  document.getElementById('result').textContent = '';
+
+  for(let i = 0; i < 5; i++) {
+    let integerPart = Math.floor(Math.random() * 1000); // 0 - 999
+    let decimalPart = Math.random(); // 0 - 0.999...
+    let n = integerPart + decimalPart;
+    numbers.push(n);
+  }
+
+  renderNumbers();
+}
+
+function renderNumbers() {
+  container.innerHTML = '';
+  numbers.forEach((num, i) => {
+    const box = document.createElement('div');
+    box.className = 'numberBox';
+    box.textContent = decimalToArabic(num);
+    box.onclick = () => selectNumber(i);
+    if(i === selectedIndex) {
+      box.classList.add('selected');
+    }
+    container.appendChild(box);
+  });
+}
+
+function selectNumber(index) {
+  if (selectedIndex === null) {
+    selectedIndex = index;
+  } else {
+    // swap
+    [numbers[selectedIndex], numbers[index]] = [numbers[index], numbers[selectedIndex]];
+    selectedIndex = null;
+  }
+  renderNumbers();
+}
+
+function checkOrder() {
+  let isSorted = true;
+  for(let i = 0; i < numbers.length - 1; i++) {
+    if(numbers[i] > numbers[i+1]) {
+      isSorted = false;
+      break;
+    }
+  }
+  const resultDiv = document.getElementById('result');
+  if(isSorted) {
+    resultDiv.textContent = "✅ أحسنت! الأعداد مرتبة تصاعدياً.";
+    resultDiv.style.color = "green";
+  } else {
+    resultDiv.textContent = "❌ الترتيب غير صحيح، حاول مرة أخرى.";
+    resultDiv.style.color = "red";
+  }
+}
+
+generateNumbers();
+</script>
+
+</body>
+</html>
